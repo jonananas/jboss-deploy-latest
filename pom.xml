@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- We assume in this pom that deploy settings are in base-pom -->
+	<parent>
+		<artifactId>base</artifactId>
+		<groupId>com.company</groupId>
+		<version>1.0</version>
+	</parent>
+
+	<groupId>com.company</groupId>
+	<artifactId>my-artifact-war</artifactId>
+	<!-- The version setup is inspired by http://devopsnet.com/2011/07/07/what-is-in-a-name-usually-a-version-number-actually/ -->
+	<version>${main.version}-${revision}</version>
+	<packaging>war</packaging>
+
+	<name>Java EE 6 webapp project</name>
+	<description>A starter Java EE 6 webapp project for use on JBoss AS 7, generated from the jboss-javaee6-webapp archetype</description>
+
+	<properties>
+		<!-- CD: Build server should use clean deploy -Dsvn.revision=${SVN_REVISION} -->
+		<svn.revision>SNAPSHOT</svn.revision>
+		<revision>${svn.revision}</revision>
+		<main.version>1.0.0</main.version>
+		<!-- CD End -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<profiles>
+		<profile>
+			<!-- Downloads JBoss 7 -->
+			<!-- Can be used in deploy-step, ie mvn clean deploy -Pdownload-jboss7 ... -->
+			<id>download-jboss7</id>
+			<build>
+				<plugins>
+					<!-- Download JBoss AS 7 into target directory -->
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>unpack</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.jboss.as</groupId>
+											<artifactId>jboss-as-dist</artifactId>
+											<version>7.1.1.Final</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>target</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
