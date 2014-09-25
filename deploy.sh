@@ -17,7 +17,7 @@ checkConfig HOSTNAME_PROD
 
 function usage {
 	echo "Usage: deploy.sh [-f] [-p <jboss-cli password>] [localhost|dev|test|prod|upgrade]"
-	echo "upgrade         Will fetch the latest version of deploy.sh from github"
+	echo "upgrade         Will fetch the latest version of deploy.sh from github. DO NOT USE WITH HOMEBREW!"
         echo "-f              Force deploy, even if no current artifact can be found"
 	echo "-p <password>   Use password for jboss-cli"
 }
