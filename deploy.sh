@@ -16,7 +16,7 @@ checkConfig HOSTNAME_TEST
 checkConfig HOSTNAME_PROD
 
 function usage {
-	echo "Usage undeploy/deploy: deploy.sh [-f] [-p <jboss-cli password>] [dev|test|prod]"
+	echo "Usage undeploy/deploy: deploy.sh [-f] [-p <jboss-cli password>] [localhost|dev|test|prod]"
         echo "-f              Force deploy, even if no current artifact can be found"
 	echo "-p <password>   Use password for jboss-cli"
 }
