@@ -7,6 +7,18 @@ Script and pom for deploying latest maven artefact to jboss using jboss-cli
 deploy.sh finds the latest artefact, using major.minor.patch-revision as version. If a newer version than is deployed
 exists it is deployed using jboss-cli.
 
+## Installing
+With homebrew:```
+brew tap jonananas/j
+brew install jboss-deploy-latest
+rehash
+```
+
+With curl:
+cd to a directory on your path. ```
+curl -o deploy.sh https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
+```
+
 ## Usage
 Run deploy.sh without parameters to see:
 ```
