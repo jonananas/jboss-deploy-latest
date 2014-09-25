@@ -52,8 +52,10 @@ prod)
 	hostname=$HOSTNAME_PROD
 	;;
 upgrade)
-	curl -o deploy.sh https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
-	echo "deploy.sh has been updated"
+	DIR="$( cd "$( dirname "$0" )" && pwd )"
+	DEPLOY_SH=$DIR/deploy.sh
+	curl -o $DEPLOY_SH https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
+	echo "$DEPLOY_SH has been updated"
 	exit 0
 	;;
 *)
