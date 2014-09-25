@@ -20,6 +20,7 @@ With curl:
 cd <to a directory on your path>
 curl -o deploy.sh https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
 ```
+You can then get the latest version by running `deploy.sh upgrade`.
 
 ## Usage
 `deploy.sh dev` updates your application to the latest maven-deployed version in your development environment. 
