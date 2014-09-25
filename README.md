@@ -16,8 +16,8 @@ rehash
 ```
 
 With curl:
-cd to a directory on your path. 
 ```
+cd <to a directory on your path>
 curl -o deploy.sh https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
 ```
 
