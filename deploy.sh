@@ -16,7 +16,8 @@ checkConfig HOSTNAME_TEST
 checkConfig HOSTNAME_PROD
 
 function usage {
-	echo "Usage undeploy/deploy: deploy.sh [-f] [-p <jboss-cli password>] [localhost|dev|test|prod]"
+	echo "Usage: deploy.sh [-f] [-p <jboss-cli password>] [localhost|dev|test|prod|upgrade]"
+	echo "upgrade         Will fetch the latest version of deploy.sh from github"
         echo "-f              Force deploy, even if no current artifact can be found"
 	echo "-p <password>   Use password for jboss-cli"
 }
@@ -49,6 +50,11 @@ test)
 	;;
 prod)
 	hostname=$HOSTNAME_PROD
+	;;
+upgrade)
+	curl -o deploy.sh https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
+	echo "deploy.sh has been updated"
+	exit 0
 	;;
 *)
 	usage
