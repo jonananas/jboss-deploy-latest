@@ -22,6 +22,7 @@ curl -o deploy.sh https://raw.githubusercontent.com/jonananas/jboss-deploy-lates
 ```
 
 ## Usage
+`deploy.sh dev` updates your application to the latest maven-deployed version in your development environment
 Run deploy.sh without parameters to see:
 ```
 deploy.sh [-f] [-p <jboss-cli password>] [dev|test|prod]
