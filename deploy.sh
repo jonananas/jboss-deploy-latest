@@ -16,15 +16,19 @@ checkConfig HOSTNAME_TEST
 checkConfig HOSTNAME_PROD
 
 function usage {
-	echo "Usage: deploy.sh [-f] [-p <jboss-cli password>] [localhost|dev|test|prod|<hostname>|upgrade]"
-	echo "upgrade         Will fetch the latest version of deploy.sh from github"
-        echo "-f              Force deploy, even if no current artifact can be found"
+	echo "Usage: deploy.sh [-f] [-p <jboss-cli password>] [-l <directory>] [localhost|dev|test|prod|upgrade]"
+	echo "upgrade         Will fetch the latest version of deploy.sh from github. DO NOT USE WITH HOMEBREW!"
+	echo "-f              Force deploy, even if no current artifact can be found"
+	echo "-l <dir>        Find latest version in directory instead of nexus"
 	echo "-p <password>   Use password for jboss-cli"
 }
 
 # Parse cmdline
-while getopts ":fp:" opt; do
+while getopts ":fp:l:" opt; do
 	case $opt in
+		l)
+			local_dir=$OPTARG
+		;;
 		f)
 			forceDeploy=deploy
 		;;
@@ -52,26 +56,31 @@ prod)
 	hostname=$HOSTNAME_PROD
 	;;
 upgrade)
-	curl -o deploy.sh https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
-	echo "deploy.sh has been updated"
+	DIR="$( cd "$( dirname "$0" )" && pwd )"
+	DEPLOY_SH=$DIR/deploy.sh
+	curl -o $DEPLOY_SH https://raw.githubusercontent.com/jonananas/jboss-deploy-latest/master/deploy.sh
+	echo "$DEPLOY_SH has been updated"
 	exit 0
 	;;
 *)
-	if [[ "$1" == "" ]]; then usage; exit 255; fi
-	hostname=$1
-	echo "Target hostname: $hostname"
+	usage
+        exit 255
 	;;
 esac
 
 # Find latest version
-latest_version=`curl http://$MAVENREPO/$ARTIFACT_PATH/$ARTIFACT_ID/ 2>/dev/null| egrep $ARTIFACT_ID | tail -1 | sed "s/.*$ARTIFACT_ID\/\(.*\)\/\".*/\1/"`
-latest_war=$ARTIFACT_ID-$latest_version.$ARTIFACT_EXT
-#if [[ "$latest_version" != [0-9]\.[0-9]\.[0-9]\-[0-9]+ ]]; then
-if [[ "$latest_version" != [0-9]\.[0-9]\.[0-9]\-[0-9]* ]]; then
-	echo "Failed finding latest version, was $latest_version"
-	exit 1
+if [ "$local_dir" != "" ]; then
+	local_file=`ls -1 $local_dir/$ARTIFACT_ID-[0-9]\.[0-9]\.[0-9]*.$ARTIFACT_EXT`
+	echo "Latest version at $local_dir is $local_file"
+else
+	latest_version=`curl http://$MAVENREPO/$ARTIFACT_PATH/$ARTIFACT_ID/ 2>/dev/null| egrep $ARTIFACT_ID | tail -1 | sed "s/.*$ARTIFACT_ID\/\(.*\)\/\".*/\1/"`
+	latest_war=$ARTIFACT_ID-$latest_version.$ARTIFACT_EXT
+	if [[ ! "$latest_version" =~ [0-9]\.[0-9]\.[0-9](\-[0-9]+|\-SNAPSHOT)? ]]; then
+		echo "Failed finding latest version, was $latest_version"
+		exit 1
+	fi
+	echo "Latest version at $MAVENREPO is $latest_war"
 fi
-echo "Latest version at $MAVENREPO is $latest_war"
 
 # Retrieve password from user
 if [[ "$PASSWORD" = "" ]]; then
@@ -81,25 +90,33 @@ fi
 
 # Find deployed version
 deployed_version=`/bin/sh $JBOSS_HOME/bin/jboss-cli.sh --connect --controller="$hostname" --command="ls deployment" --user=admin --password=$PASSWORD |grep $ARTIFACT_ID`
-if [[ "$deployed_version" != $ARTIFACT_ID-[0-9]\.[0-9]\.[0-9]\-[0-9]*\.$ARTIFACT_EXT ]]; then
+if [[ ! "$deployed_version" =~ $ARTIFACT_ID-[0-9]\.[0-9]\.[0-9](\-[0-9]+|\-SNAPSHOT)?\.$ARTIFACT_EXT ]]; then
 	echo "Failed finding deployed version, was $deployed_version"
 	test "$forceDeploy" == "deploy" || exit 1
 fi
 echo "Deployed version at $hostname is $deployed_version"
 
-# Undeploy current version and deploy latest
-if [ "$deployed_version" == "$latest_war" ]; then
-	echo "Latest version is already deployed"
-	exit 0
-else
-	curl "http://$MAVENREPO/$ARTIFACT_PATH/$ARTIFACT_ID/$latest_version/$latest_war" > /tmp/$latest_war
-	echo "Updating $hostname to $latest_war, when done list of deploys will appear"
-	commands="undeploy $deployed_version, deploy /tmp/$latest_war, ls deployment"
+
+function deploy {
+	deployable=$1
+	echo "Deploying $deployable onto $hostname, when done list of deploys will appear"
+	commands="undeploy $deployed_version, deploy $deployable, ls deployment"
 	/bin/sh $JBOSS_HOME/bin/jboss-cli.sh --connect --controller="$hostname" --user=admin --password=$PASSWORD --commands="$commands"
 	if [ $? -eq 0 ]; then 
 		echo -- Deploy succeeded --
 	else
 		echo -- Deploy failed --
 	fi
+}
+
+# Undeploy current version and deploy latest
+if [ "$local_file" != "" ]; then
+	deploy $local_file
+elif [ "$deployed_version" == "$latest_war" ]; then
+	echo "Latest version is already deployed"
+	exit 0
+else
+	curl "http://$MAVENREPO/$ARTIFACT_PATH/$ARTIFACT_ID/$latest_version/$latest_war" > /tmp/$latest_war
+	deploy /tmp/$latest_war
 	rm /tmp/$latest_war
 fi
