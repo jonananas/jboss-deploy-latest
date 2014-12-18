@@ -16,7 +16,8 @@ checkConfig HOSTNAME_TEST
 checkConfig HOSTNAME_PROD
 
 function usage {
-	echo "Usage: deploy.sh [-f] [-p <jboss-cli password>] [-l <directory>] [localhost|dev|test|prod|upgrade]"
+	echo "Usage: deploy.sh [-f] [-p <jboss-cli password>] [-l <directory>] [localhost|dev [idx]|test [idx]|prod [idx]|upgrade]"
+	echo "idx             Index starting with 0 if dev/test/prod host is comma-separated list, default is 0"
 	echo "upgrade         Will fetch the latest version of deploy.sh from github. DO NOT USE WITH HOMEBREW!"
 	echo "-f              Force deploy, even if no current artifact can be found"
 	echo "-l <dir>        Find latest version in directory instead of nexus"
@@ -42,18 +43,26 @@ while getopts ":fp:l:" opt; do
 done
 shift $(($OPTIND-1))
 
+function set_hostname {
+	IFS=', ' read -a hosts <<< "$1"
+        hostidx=0
+        [[ "$2" =~ [0-9] ]] && hostidx=$2
+        (( $hostidx >= ${#hosts[@]} )) && { echo "Invalid hostidx $hostidx in $1"; exit 255; }
+        hostname="${hosts[hostidx]}"
+}
+
 case $1 in
 localhost)
 	hostname=localhost
 	;;
 dev)
-	hostname=$HOSTNAME_DEV
+	set_hostname $HOSTNAME_DEV $2
 	;;
 test)
-	hostname=$HOSTNAME_TEST
+	set_hostname $HOSTNAME_TEST $2
 	;;
 prod)
-	hostname=$HOSTNAME_PROD
+	set_hostname $HOSTNAME_PROD $2
 	;;
 upgrade)
 	DIR="$( cd "$( dirname "$0" )" && pwd )"
