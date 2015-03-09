@@ -82,7 +82,7 @@ if [ "$local_dir" != "" ]; then
 	local_file=`ls -1 $local_dir/$ARTIFACT_ID-[0-9]\.[0-9]\.[0-9]*.$ARTIFACT_EXT`
 	echo "Latest version at $local_dir is $local_file"
 else
-	latest_version=`curl http://$MAVENREPO/$ARTIFACT_PATH/$ARTIFACT_ID/ 2>/dev/null| egrep $ARTIFACT_ID | tail -1 | sed "s/.*$ARTIFACT_ID\/\(.*\)\/\".*/\1/"`
+	latest_version=`curl http://$MAVENREPO/$ARTIFACT_PATH/$ARTIFACT_ID/ 2>/dev/null| egrep $ARTIFACT_ID | sed "s/.*$ARTIFACT_ID\/\(.*\)\/\".*/\1/" | sort -t. -k1,1n -k2,2n -k3,3n | tail -1`
 	latest_war=$ARTIFACT_ID-$latest_version.$ARTIFACT_EXT
 	if [[ ! "$latest_version" =~ [0-9]+\.[0-9]+\.[0-9]+(\-[0-9]+|\-SNAPSHOT)? ]]; then
 		echo "Failed finding latest version, was $latest_version"
