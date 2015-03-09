@@ -84,7 +84,7 @@ if [ "$local_dir" != "" ]; then
 else
 	latest_version=`curl http://$MAVENREPO/$ARTIFACT_PATH/$ARTIFACT_ID/ 2>/dev/null| egrep $ARTIFACT_ID | tail -1 | sed "s/.*$ARTIFACT_ID\/\(.*\)\/\".*/\1/"`
 	latest_war=$ARTIFACT_ID-$latest_version.$ARTIFACT_EXT
-	if [[ ! "$latest_version" =~ [0-9]\.[0-9]\.[0-9](\-[0-9]+|\-SNAPSHOT)? ]]; then
+	if [[ ! "$latest_version" =~ [0-9]+\.[0-9]+\.[0-9]+(\-[0-9]+|\-SNAPSHOT)? ]]; then
 		echo "Failed finding latest version, was $latest_version"
 		exit 1
 	fi
@@ -99,7 +99,7 @@ fi
 
 # Find deployed version
 deployed_version=`/bin/sh $JBOSS_HOME/bin/jboss-cli.sh --connect --controller="$hostname" --command="ls deployment" --user=admin --password=$PASSWORD |grep $ARTIFACT_ID`
-if [[ ! "$deployed_version" =~ $ARTIFACT_ID-[0-9]\.[0-9]\.[0-9](\-[0-9]+|\-SNAPSHOT)?\.$ARTIFACT_EXT ]]; then
+if [[ ! "$deployed_version" =~ $ARTIFACT_ID-[0-9]+\.[0-9]+\.[0-9]+(\-[0-9]+|\-SNAPSHOT)?\.$ARTIFACT_EXT ]]; then
 	echo "Failed finding deployed version, was $deployed_version"
 	test "$forceDeploy" == "deploy" || exit 1
 fi
