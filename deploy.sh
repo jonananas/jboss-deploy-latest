@@ -1,6 +1,15 @@
 #!/bin/bash
 
 test "$JBOSS_HOME" == "" && { echo "JBOSS_HOME not set, need it to find jboss-cli.sh, example: export JBOSS_HOME=~/jboss-7" >&2; exit 255; }
+if [ -f ~/.deploy.cfg ]; then 
+	source ~/.deploy.cfg
+	echo Downloading global ~/.deploy.cfg from $DEPLOY_REPO
+	(cd ~; git archive --remote=$DEPLOY_REPO HEAD .deploy.cfg|tar -x )
+	source ~/.deploy.cfg
+else
+	echo "Create ~/.deploy.cfg to use global.cfg, example line:"
+	echo DEPLOY_REPO=ssh://git@stash.dev.company.se:7999/MCONF/deploy.git
+fi
 source ./deploy.cfg
 
 function checkConfig {
