@@ -3,7 +3,7 @@
 test "$JBOSS_HOME" == "" && { echo "JBOSS_HOME not set, need it to find jboss-cli.sh, example: export JBOSS_HOME=~/jboss-7" >&2; exit 255; }
 source ./deploy.cfg
 if [[ "$DEPLOY_CFG_URL" != "" ]]; then 
-	curl -o .deploy.cfg $DEPLOY_CFG_URL
+	curl -o -s .deploy.cfg $DEPLOY_CFG_URL
 	source ./.deploy.cfg
 	rm ./.deploy.cfg
 	source ./deploy.cfg
