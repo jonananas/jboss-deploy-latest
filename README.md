@@ -33,7 +33,7 @@ deploy.sh [-f] [-p <jboss-cli password>] [dev|test|prod]
 
 ## Configuration
 Put project specific configuration in each project root, see example file deploy.cfg
-You may create a global config, only git repos are supported at the moment. Add ~/.deploy.sh with the line (edit to point to your repo):
+You may create a global config, only git repos are supported at the moment. Add DEPLOY_REPO to deploy.cfg example follows (edit to point to your repo):
 DEPLOY_REPO=ssh://git@stash.dev.company.se:7999/MCONF/deploy.git
 
 # pom.xml
