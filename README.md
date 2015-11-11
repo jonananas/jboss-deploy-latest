@@ -32,7 +32,7 @@ deploy.sh [-f] [-p <jboss-cli password>] [dev|test|prod]
 ```
 
 ## Configuration
-Put project specific configuration in each project root, see example file deploy.cfg
+Put project specific configuration in each project root, see example file deploy.cfg.
 You may create a global config that will be downloaded on each run. To do so, add DEPLOY_CFG_URL to deploy.cfg according to example below (edit url point to your repo):
 ```
 DEPLOY_CFG_URL=http://stash.dev.company.se/projects/CONF/repos/deploy/browse/global-deploy.cfg?raw
